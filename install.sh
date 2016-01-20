@@ -11,7 +11,7 @@ else
     make dkms
 fi
 
-quirk='0x0c45:0x7603:0x0007'
+quirk='0x0c45:0x7603:0x00000004'
 modquirk="options usbhid quirks=$quirk"
 grubquirk="usbhid.quirks=$quirk"
 
@@ -24,7 +24,7 @@ if (lsmod | grep 'usbhid'); then
         echo $modquirk >> /etc/modprobe.d/usbhid.conf
         if [[ $1 != 'dkms' ]]; then sudo echo 'px1800kbd' >> /etc/modules; fi
     else
-       echo 'NOTICE - modprobe config files have already been updated'
+        echo 'NOTICE - modprobe config files have already been updated'
     fi
 
     echo '## Starting module ##'
@@ -44,9 +44,8 @@ else
         echo '## Writing to /etc/default/grub.d/px1800kbd.conf ##'
         echo $grubquirk >> /etc/default/grub.d/px1800kbd.conf
     else
-       echo 'NOTICE - grub config file has already been updated'
+        echo 'NOTICE - grub config file has already been updated'
     fi
 
     echo '## You must reboot to load the module ##'
-fi 
-
+fi

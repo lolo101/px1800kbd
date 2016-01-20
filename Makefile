@@ -8,21 +8,20 @@ MODULE_NAME := px1800kbd
 MODULE_VER := 1.0.0
 
 ifeq ($(DEBUG),y)
-        DBGFLAGS = -O -g -DML_DEBUG
+	DBGFLAGS = -O -g -DML_DEBUG
 else
-        DBGFLAGS = -O2
+	DBGFLAGS = -O2
 endif
 
 ccflags-y += $(DBGFLAGS)
 
 
 ifneq ($(KERNELRELEASE),)
-        obj-m := $(MODULE_NAME).o
+	obj-m := $(MODULE_NAME).o
 else
-        KSRC := /lib/modules/$(KVER)/build
-        PWD := $(shell pwd)
+	KSRC := /lib/modules/$(KVER)/build
+	PWD := $(shell pwd)
 endif
-	#@if [ -n $(dkms status $(MODULE_NAME)/$(MODULE_VER)) ]; then \
 
 define REMOVE_MODULE
 	@if [ -n "`dkms status $(MODULE_NAME)/$(MODULE_VER)`" ]; then \
@@ -46,9 +45,8 @@ install:
 
 dkms:  clean
 	rm -rf /usr/src/$(MODULE_NAME)-$(MODULE_VER)
-	mkdir /usr/src/$(MODULE_NAME)-$(MODULE_VER) -p
-	cp . /usr/src/$(MODULE_NAME)-$(MODULE_VER) -a
-	rm -rf /usr/src/$(MODULE_NAME)-$(MODULE_VER)/.hg
+	mkdir --parent /usr/src/$(MODULE_NAME)-$(MODULE_VER)
+	cp --target-directory=/usr/src/$(MODULE_NAME)-$(MODULE_VER) Makefile dkms.conf px1800kbd.c
 	$(REMOVE_MODULE)
 	dkms add -m $(MODULE_NAME) -v $(MODULE_VER)
 	dkms build -m $(MODULE_NAME) -v $(MODULE_VER)

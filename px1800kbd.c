@@ -47,46 +47,46 @@ MODULE_LICENSE(DRIVER_LICENSE);
 
 static const unsigned char az_kbd_keycode[256] = {
 		/* BEGIN 04 */
-/* 0-7 */	KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED,   
-/* 8-15 */	KEY_LEFTCTRL, KEY_LEFTSHIFT, KEY_LEFTALT, KEY_LEFTMETA, KEY_RIGHTCTRL, KEY_RIGHTSHIFT, KEY_RIGHTALT, KEY_RESERVED,   
+/* 0-7 */	KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED,
+/* 8-15 */	KEY_LEFTCTRL, KEY_LEFTSHIFT, KEY_LEFTALT, KEY_LEFTMETA, KEY_RIGHTCTRL, KEY_RIGHTSHIFT, KEY_RIGHTALT, KEY_RESERVED,
 /* 16-23 */	KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_A, KEY_B, KEY_C, KEY_D,
 /* 24-31 */	KEY_E, KEY_F, KEY_G, KEY_H, KEY_I, KEY_J, KEY_K, KEY_L,
 /* 32-39 */	KEY_M, KEY_N, KEY_O, KEY_P, KEY_Q, KEY_R, KEY_S, KEY_T,
-/* 40-47 */	KEY_U, KEY_V, KEY_W, KEY_X, KEY_Y, KEY_Z, KEY_1, KEY_2, 	  	  
-/* 48-55 */	KEY_3, KEY_4, KEY_5, KEY_6, KEY_7, KEY_8, KEY_9, KEY_0, 
+/* 40-47 */	KEY_U, KEY_V, KEY_W, KEY_X, KEY_Y, KEY_Z, KEY_1, KEY_2,
+/* 48-55 */	KEY_3, KEY_4, KEY_5, KEY_6, KEY_7, KEY_8, KEY_9, KEY_0,
 /* 56-63 */	KEY_ENTER, KEY_ESC, KEY_BACKSPACE, KEY_TAB, KEY_SPACE, KEY_MINUS, KEY_EQUAL, KEY_LEFTBRACE,
 		/* END 04 */
-	  
+
 		/* BEGIN 05 */
-/* 64-71 */	KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED,   
-/* 72-79 */	KEY_RIGHTBRACE, KEY_BACKSLASH, KEY_RESERVED, KEY_SEMICOLON, KEY_APOSTROPHE, KEY_GRAVE, KEY_COMMA, KEY_DOT,
+/* 64-71 */	KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED,
+/* 72-79 */	KEY_RIGHTBRACE, KEY_BACKSLASH, KEY_BACKSLASH, KEY_SEMICOLON, KEY_APOSTROPHE, KEY_GRAVE, KEY_COMMA, KEY_DOT,
 /* 80-87 */	KEY_SLASH, KEY_CAPSLOCK, KEY_F1, KEY_F2, KEY_F3, KEY_F4, KEY_F5, KEY_F6,
 /* 88-95 */	KEY_F7, KEY_F8, KEY_F9, KEY_F10, KEY_F11, KEY_F12, KEY_SYSRQ, KEY_SCROLLLOCK,
-/* 96-103 */	KEY_PAUSE, KEY_INSERT, KEY_HOME, KEY_PAGEUP, KEY_DELETE, KEY_END, KEY_PAGEDOWN, KEY_RIGHT, 
+/* 96-103 */	KEY_PAUSE, KEY_INSERT, KEY_HOME, KEY_PAGEUP, KEY_DELETE, KEY_END, KEY_PAGEDOWN, KEY_RIGHT,
 /* 104-111 */   KEY_LEFT, KEY_DOWN, KEY_UP, KEY_NUMLOCK, KEY_KPSLASH, KEY_KPASTERISK, KEY_KPMINUS, KEY_KPPLUS,
-/* 112-119 */   KEY_KPENTER, KEY_KP1, KEY_KP2, KEY_KP3, KEY_KP4, KEY_KP5, KEY_KP6, KEY_KP7,   
+/* 112-119 */   KEY_KPENTER, KEY_KP1, KEY_KP2, KEY_KP3, KEY_KP4, KEY_KP5, KEY_KP6, KEY_KP7,
 /* 120-127 */   KEY_KP8, KEY_KP9, KEY_KP0, KEY_KPDOT, KEY_102ND, KEY_MENU, KEY_RESERVED, KEY_RESERVED,
 		/* END 05 */
-	  
+
 	        /* 01 */
 /* 128-135 */   KEY_VOLUMEDOWN, KEY_VOLUMEUP, KEY_MEDIA, KEY_MUTE, KEY_PAUSE, KEY_PREVIOUSSONG, KEY_PLAYPAUSE, KEY_NEXTSONG,
 /* 136-143 */   KEY_MAIL, KEY_HOMEPAGE, KEY_CALC, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED,
-/* 144-151 */   KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED,   
-/* 152-159 */   KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED,   
-/* 160-167 */   KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED,   
-/* 168-175 */   KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED,   
-/* 176-183 */   KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED,   
-/* 184-191 */   KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED,   
-	  
+/* 144-151 */   KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED,
+/* 152-159 */   KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED,
+/* 160-167 */   KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED,
+/* 168-175 */   KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED,
+/* 176-183 */   KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED,
+/* 184-191 */   KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED,
+
 		/* BEGIN 06 */
-/* 192-199 */   KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED,   
+/* 192-199 */   KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED,
 /* 200-207 */   KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED,
-/* 208-215 */   KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED,   
-/* 216-223 */   KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED,   
-/* 224-231 */   KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_SLASH,   
-/* 232-239 */   KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED,   
-/* 240-247 */   KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED,   
-/* 248-255 */   KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED,   
+/* 208-215 */   KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED,
+/* 216-223 */   KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED,
+/* 224-231 */   KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_SLASH,
+/* 232-239 */   KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED,
+/* 240-247 */   KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED,
+/* 248-255 */   KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED,
 		/* END 06 */
 };
 
@@ -135,7 +135,7 @@ static void usb_kbd_irq(struct urb *urb)
 {
 	struct usb_kbd *kbd = urb->context;
 	int i, j, offset;
-	
+
 	switch (urb->status) {
 	case 0:			/* success */
 		break;
@@ -149,43 +149,43 @@ static void usb_kbd_irq(struct urb *urb)
 	}
 
 /*
- 	printk("Keyup keycode: ");		
+ 	printk("Keyup keycode: ");
 
  	for (i = 0; i < 8; i++)
- 	    printk("%d ", kbd->old[i]);		
+ 	    printk("%d ", kbd->old[i]);
 
 	printk("\n");
 */
 
 /*
-        // The following lines are for logging keypresses to the 
+        // The following lines are for logging keypresses to the
 	// kernel dmesg facility. Uncomment the following lines
 	// to capture the keycode for any non-functioning keys
-	// and open a new issue on bitbucket.org with the key 
-	// you pressed and the keycode output below. 
-	
- 	printk("Keydown keycode: ");		
+	// and open a new issue on bitbucket.org with the key
+	// you pressed and the keycode output below.
+
+ 	printk("Keydown keycode: ");
 
  	for (i = 0; i < 8; i++)
- 	    printk("%d ", kbd->new[i]);		
+ 	    printk("%d ", kbd->new[i]);
 
 	printk("\n");
 */
 
 
-	if (kbd->new[0] == 1) {	    
-	    // volume down 
+	if (kbd->new[0] == 1) {
+	    // volume down
 	    if (kbd->new[1] == 234 && kbd->old[1] != 234)
 		input_report_key(kbd->dev, az_kbd_keycode[128], 1);
 	    if (kbd->old[1] == 234 && kbd->new[1] != 234)
 		input_report_key(kbd->dev, az_kbd_keycode[128], 0);
-	
+
 	    // volume up
- 	    if (kbd->new[1] == 233 && kbd->old[1] != 233) 
+ 	    if (kbd->new[1] == 233 && kbd->old[1] != 233)
  		input_report_key(kbd->dev, az_kbd_keycode[129], 1);
- 	    if (kbd->old[1] == 233 && kbd->new[1] != 233) 
- 		input_report_key(kbd->dev, az_kbd_keycode[129], 0);            
-            
+ 	    if (kbd->old[1] == 233 && kbd->new[1] != 233)
+ 		input_report_key(kbd->dev, az_kbd_keycode[129], 0);
+
             // Media
             if (kbd->new[1] == 131 && kbd->old[1] != 131)
               input_report_key(kbd->dev, az_kbd_keycode[130], 1);
@@ -244,24 +244,24 @@ static void usb_kbd_irq(struct urb *urb)
  	    for (j = 1; j < 8; j++) {
  		offset = j * 8;
  		for (i = 0; i < 8; i++)
- 		    input_report_key(kbd->dev, az_kbd_keycode[offset + i], (kbd->new[j] >> i) & 1);	  
+ 		    input_report_key(kbd->dev, az_kbd_keycode[offset + i], (kbd->new[j] >> i) & 1);
  	    }
  	}
  	else if (kbd->new[0] == 5) {
  	    for (j = 1; j < 8; j++) {
  		offset = (j * 8) + 64;
  		for (i = 0; i < 8; i++)
- 		    input_report_key(kbd->dev, az_kbd_keycode[offset + i], (kbd->new[j] >> i) & 1);	  		
+ 		    input_report_key(kbd->dev, az_kbd_keycode[offset + i], (kbd->new[j] >> i) & 1);
  	    }
  	}
  	else if (kbd->new[0] == 6) {
  	    for (j = 1; j < 8; j++) {
  		offset = (j * 8) + 192;
  		for (i = 0; i < 8; i++)
- 		    input_report_key(kbd->dev, az_kbd_keycode[offset + i], (kbd->new[j] >> i) & 1);	  		
+ 		    input_report_key(kbd->dev, az_kbd_keycode[offset + i], (kbd->new[j] >> i) & 1);
  	    }
  	}
-	
+
 	input_sync(kbd->dev);
 
 	memcpy(kbd->old, kbd->new, 8);
@@ -371,7 +371,7 @@ static int usb_kbd_probe(struct usb_interface *iface,
 	struct input_dev *input_dev;
 	int i, pipe, maxp;
 	int error = -ENOMEM;
-	
+
 	interface = iface->cur_altsetting;
 
 	if (interface->desc.bNumEndpoints != 1)
@@ -408,7 +408,7 @@ static int usb_kbd_probe(struct usb_interface *iface,
 			 "USB HIDBP Keyboard %04x:%04x",
 			 le16_to_cpu(dev->descriptor.idVendor),
 			 le16_to_cpu(dev->descriptor.idProduct));
-		
+
 	printk("<1>px1800kbd: detected %s\n", kbd->name);
 
 	usb_make_path(dev, kbd->phys, sizeof(kbd->phys));
@@ -429,7 +429,7 @@ static int usb_kbd_probe(struct usb_interface *iface,
 
 	for (i = 0; i < 255; i++)
 		set_bit(az_kbd_keycode[i], input_dev->keybit);
-	
+
 	clear_bit(0, input_dev->keybit);
 
 	input_dev->event = usb_kbd_event;
@@ -463,9 +463,9 @@ static int usb_kbd_probe(struct usb_interface *iface,
 	device_set_wakeup_enable(&dev->dev, 1);
 	return 0;
 
-fail2:	
+fail2:
 	usb_kbd_free_mem(dev, kbd);
-fail1:	
+fail1:
 	input_free_device(input_dev);
 	kfree(kbd);
 	return error;

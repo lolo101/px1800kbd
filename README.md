@@ -50,7 +50,7 @@ Create a file called `/etc/modprobe.d/usbhid.conf` and add the following to it:
 
     options usbhid quirks=0x0c45:0x7603:0x00000004
 
-For more information about quirks, see `include/linux/hid.h`.
+For more information about quirks, see [`include/linux/hid.h`](https://github.com/torvalds/linux/blob/master/include/linux/hid.h).
 
 ## Compiled into Kernel ##
 

@@ -11,9 +11,9 @@ else
     make dkms
 fi
 
-quirk='0x0c45:0x7603:0x00000004'
-modquirk="options usbhid quirks=$quirk"
-grubquirk="usbhid.quirks=$quirk"
+quirksoption='quirks=0x0c45:0x7603:0x00000004'
+modquirk="options usbhid $quirksoption"
+grubquirk="usbhid.$quirksoption"
 
 if (lsmod | grep 'usbhid'); then
     echo '## usbhid is module ##'
@@ -27,15 +27,15 @@ if (lsmod | grep 'usbhid'); then
         echo 'NOTICE - modprobe config files have already been updated'
     fi
 
-    echo '## Starting module ##'
-    modprobe px1800kbd
-
     # Note: this line may fail if you have other drivers loaded that depend
     # on usbhid. For example, your mouse driver. In that case you would have
     # to remove those drivers first, then load them again.
 
     echo '## Attempting to reload usbhid module ##'
-    rmmod usbhid && modprobe usbhid quirks=$quirk
+    rmmod usbhid && modprobe usbhid $quirksoption
+
+    echo '## Starting module ##'
+    modprobe px1800kbd
 else
     echo '## usbhid is compiled into kernel ##'
 

@@ -22,7 +22,7 @@
  * Mail your message to Loïc Broquet <lbroquet@online.fr>
  */
 
-#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
+#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt "\n"
 
 #include <linux/kernel.h>
 #include <linux/slab.h>
@@ -34,7 +34,6 @@
 /*
  * Version Information
  */
-#define DRIVER_VERSION ""
 #define DRIVER_AUTHOR "Loïc Broquet <lbroquet@online.fr>"
 #define DRIVER_DESC "Perixx PX-1800 Keyboard Driver"
 #define DRIVER_LICENSE "GPL"
@@ -128,6 +127,16 @@ struct usb_kbd {
 	dma_addr_t leds_dma;
 };
 
+static void check_key_pressed_released(struct usb_kbd *kbd, int value, int keycode)
+{
+	if (kbd->new[1] == value && kbd->old[1] != value)
+		// key pressed
+		input_report_key(kbd->dev, keycode, 1);
+	if (kbd->old[1] == value && kbd->new[1] != value)
+		// key released
+		input_report_key(kbd->dev, keycode, 0);
+}
+
 static void usb_kbd_irq(struct urb *urb)
 {
 	struct usb_kbd *kbd = urb->context;
@@ -168,71 +177,17 @@ static void usb_kbd_irq(struct urb *urb)
 */
 
 	if (mode == 1) {
-		// volume down
-		if (kbd->new[1] == 234 && kbd->old[1] != 234)
-			input_report_key(kbd->dev, az_kbd_keycode[0], 1);
-		if (kbd->old[1] == 234 && kbd->new[1] != 234)
-			input_report_key(kbd->dev, az_kbd_keycode[0], 0);
-
-		// volume up
-		if (kbd->new[1] == 233 && kbd->old[1] != 233)
-			input_report_key(kbd->dev, az_kbd_keycode[1], 1);
-		if (kbd->old[1] == 233 && kbd->new[1] != 233)
-			input_report_key(kbd->dev, az_kbd_keycode[1], 0);
-
-		// Media
-		if (kbd->new[1] == 131 && kbd->old[1] != 131)
-			input_report_key(kbd->dev, az_kbd_keycode[2], 1);
-		if (kbd->old[1] == 131 && kbd->new[1] != 131)
-			input_report_key(kbd->dev, az_kbd_keycode[2], 0);
-
-		// Mute
-		if (kbd->new[1] == 226 && kbd->old[1] != 226)
-			input_report_key(kbd->dev, az_kbd_keycode[3], 1);
-		if (kbd->old[1] == 226 && kbd->new[1] != 226)
-			input_report_key(kbd->dev, az_kbd_keycode[3], 0);
-
-		// Stop
-		if (kbd->new[1] == 183 && kbd->old[1] != 183)
-			input_report_key(kbd->dev, az_kbd_keycode[4], 1);
-		if (kbd->old[1] == 183 && kbd->new[1] != 183)
-			input_report_key(kbd->dev, az_kbd_keycode[4], 0);
-
-		// Prev Song
-		if (kbd->new[1] == 182 && kbd->old[1] != 182)
-			input_report_key(kbd->dev, az_kbd_keycode[5], 1);
-		if (kbd->old[1] == 182 && kbd->new[1] != 182)
-			input_report_key(kbd->dev, az_kbd_keycode[5], 0);
-
-		// Play/Pause
-		if (kbd->new[1] == 205 && kbd->old[1] != 205)
-			input_report_key(kbd->dev, az_kbd_keycode[6], 1);
-		if (kbd->old[1] == 205 && kbd->new[1] != 205)
-			input_report_key(kbd->dev, az_kbd_keycode[6], 0);
-
-		// Next Song
-		if (kbd->new[1] == 181 && kbd->old[1] != 181)
-			input_report_key(kbd->dev, az_kbd_keycode[7], 1);
-		if (kbd->old[1] == 181 && kbd->new[1] != 181)
-			input_report_key(kbd->dev, az_kbd_keycode[7], 0);
-
-		// Mail
-		if (kbd->new[1] == 138 && kbd->old[1] != 138)
-			input_report_key(kbd->dev, az_kbd_keycode[8], 1);
-		if (kbd->old[1] == 138 && kbd->new[1] != 138)
-			input_report_key(kbd->dev, az_kbd_keycode[8], 0);
-
-		// Homepage
-		if (kbd->new[1] == 35 && kbd->old[1] != 35)
-			input_report_key(kbd->dev, az_kbd_keycode[9], 1);
-		if (kbd->old[1] == 35 && kbd->new[1] != 35)
-			input_report_key(kbd->dev, az_kbd_keycode[9], 0);
-
-		// Calc
-		if (kbd->new[1] == 146 && kbd->old[1] != 146)
-			input_report_key(kbd->dev, az_kbd_keycode[10], 1);
-		if (kbd->old[1] == 146 && kbd->new[1] != 146)
-			input_report_key(kbd->dev, az_kbd_keycode[10], 0);
+		check_key_pressed_released(kbd, 35, KEY_HOMEPAGE);
+		check_key_pressed_released(kbd, 131, KEY_MEDIA);
+		check_key_pressed_released(kbd, 138, KEY_MAIL);
+		check_key_pressed_released(kbd, 146, KEY_CALC);
+		check_key_pressed_released(kbd, 181, KEY_NEXTSONG);
+		check_key_pressed_released(kbd, 182, KEY_PREVIOUSSONG);
+		check_key_pressed_released(kbd, 183, KEY_PAUSE);
+		check_key_pressed_released(kbd, 205, KEY_PLAYPAUSE);
+		check_key_pressed_released(kbd, 226, KEY_MUTE);
+		check_key_pressed_released(kbd, 233, KEY_VOLUMEUP);
+		check_key_pressed_released(kbd, 234, KEY_VOLUMEDOWN);
 	}
 	else {
 		for (j = 1; j < 8; j++) {
@@ -390,7 +345,7 @@ static int usb_kbd_probe(struct usb_interface *iface,
 			 le16_to_cpu(dev->descriptor.idVendor),
 			 le16_to_cpu(dev->descriptor.idProduct));
 
-	printk("<1>px1800kbd: detected %s\n", kbd->name);
+	printk(KERN_INFO pr_fmt("detected %s"), kbd->name);
 
 	usb_make_path(dev, kbd->phys, sizeof(kbd->phys));
 	strlcat(kbd->phys, "/input0", sizeof(kbd->phys));
@@ -474,7 +429,7 @@ static struct usb_device_id usb_kbd_id_table [] = {
 MODULE_DEVICE_TABLE (usb, usb_kbd_id_table);
 
 static struct usb_driver usb_kbd_driver = {
-	.name =		"px1800kbd",
+	.name =		KBUILD_MODNAME,
 	.probe =	usb_kbd_probe,
 	.disconnect =	usb_kbd_disconnect,
 	.id_table =	usb_kbd_id_table,
@@ -483,9 +438,7 @@ static struct usb_driver usb_kbd_driver = {
 static int __init usb_kbd_init(void)
 {
 	int result = usb_register(&usb_kbd_driver);
-	if (result == 0)
-		printk(KERN_INFO KBUILD_MODNAME ": " DRIVER_VERSION ":"
-				DRIVER_DESC "\n");
+	printk(KERN_INFO pr_fmt(DRIVER_DESC " registration status: %d"), result);
 	return result;
 }
 

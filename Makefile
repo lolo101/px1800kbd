@@ -5,7 +5,8 @@ KVER := $(shell uname -r)
 KSRC := /lib/modules/$(KVER)/build
 MODDESTDIR := /lib/modules/$(KVER)/kernel/drivers/input/keyboard
 MODULE_NAME := px1800kbd
-MODULE_VER := 1.0.0
+MODULE_VER := 2.0.0-SNAPSHOT
+MODSRCDIR := /usr/src/$(MODULE_NAME)-$(MODULE_VER)
 
 ifeq ($(DEBUG),y)
 	DBGFLAGS = -O -g -DML_DEBUG
@@ -44,9 +45,10 @@ install:
 	/sbin/depmod -a ${KVER}
 
 dkms:  clean
-	rm -rf /usr/src/$(MODULE_NAME)-$(MODULE_VER)
-	mkdir --parent /usr/src/$(MODULE_NAME)-$(MODULE_VER)
-	cp --target-directory=/usr/src/$(MODULE_NAME)-$(MODULE_VER) Makefile dkms.conf px1800kbd.c
+	rm -rf ${MODSRCDIR}
+	mkdir --parent ${MODSRCDIR}
+	cp --target-directory=${MODSRCDIR} Makefile px1800kbd.c
+	sed -e s/%MODULE_NAME%/${MODULE_NAME}/ -e s/%MODULE_VER%/$(MODULE_VER)/ dkms.conf > ${MODSRCDIR}/dkms.conf
 	$(REMOVE_MODULE)
 	dkms add -m $(MODULE_NAME) -v $(MODULE_VER)
 	dkms build -m $(MODULE_NAME) -v $(MODULE_VER)

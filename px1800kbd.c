@@ -24,15 +24,12 @@
 
 #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt "\n"
 
-#include <linux/kernel.h>
-#include <linux/slab.h>
 #include <linux/module.h>
-#include <linux/init.h>
 #include <linux/usb/input.h>
 #include <linux/hid.h>
 
 /*
- * Version Information
+ * Driver Information
  */
 #define DRIVER_AUTHOR "Loïc Broquet <lbroquet@online.fr>"
 #define DRIVER_DESC "Perixx PX-1800 Keyboard Driver"
@@ -44,7 +41,7 @@ MODULE_AUTHOR(DRIVER_AUTHOR);
 MODULE_DESCRIPTION(DRIVER_DESC);
 MODULE_LICENSE(DRIVER_LICENSE);
 
-static const unsigned char az_kbd_keycode[224] = {
+static const unsigned char px_kbd_keycode[224] = {
 		/* BEGIN 01 */
 /* 0-7 */	KEY_VOLUMEDOWN, KEY_VOLUMEUP, KEY_MEDIA, KEY_MUTE, KEY_PAUSE, KEY_PREVIOUSSONG, KEY_PLAYPAUSE, KEY_NEXTSONG,
 /* 8-15 */	KEY_MAIL, KEY_HOMEPAGE, KEY_CALC, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED,
@@ -160,7 +157,7 @@ static void usb_kbd_irq(struct urb *urb)
 	// to capture the keycode for any non-functioning keys
 	// and open a new issue on bitbucket.org with the key
 	// you pressed and the keycode output below.
-/*
+#ifdef DEBUG
 	printk("Keyup keycode: ");
 
 	for (i = 0; i < 8; i++)
@@ -174,7 +171,7 @@ static void usb_kbd_irq(struct urb *urb)
 		printk("%d ", kbd->new[i]);
 
 	printk("\n");
-*/
+#endif
 
 	if (mode == 1) {
 		check_key_pressed_released(kbd, 35, KEY_HOMEPAGE);
@@ -193,7 +190,7 @@ static void usb_kbd_irq(struct urb *urb)
 		for (j = 1; j < 8; j++) {
 			offset = (mode - 3) * 56 + (j - 1) * 8;
 			for (i = 0; i < 8; i++)
-				input_report_key(kbd->dev, az_kbd_keycode[offset + i], (kbd->new[j] >> i) & 1);
+				input_report_key(kbd->dev, px_kbd_keycode[offset + i], (kbd->new[j] >> i) & 1);
 		}
 	}
 
@@ -345,7 +342,7 @@ static int usb_kbd_probe(struct usb_interface *iface,
 			 le16_to_cpu(dev->descriptor.idVendor),
 			 le16_to_cpu(dev->descriptor.idProduct));
 
-	printk(KERN_INFO pr_fmt("detected %s"), kbd->name);
+	pr_info("detected %s", kbd->name);
 
 	usb_make_path(dev, kbd->phys, sizeof(kbd->phys));
 	strlcat(kbd->phys, "/input0", sizeof(kbd->phys));
@@ -357,16 +354,14 @@ static int usb_kbd_probe(struct usb_interface *iface,
 
 	input_set_drvdata(input_dev, kbd);
 
-	input_dev->evbit[0] = BIT_MASK(EV_KEY) | BIT_MASK(EV_LED) |
-		BIT_MASK(EV_REP);
-	input_dev->ledbit[0] = BIT_MASK(LED_NUML) | BIT_MASK(LED_CAPSL) |
-		BIT_MASK(LED_SCROLLL) | BIT_MASK(LED_COMPOSE) |
-		BIT_MASK(LED_KANA);
+	input_dev->evbit[0] = BIT_MASK(EV_KEY) | BIT_MASK(EV_LED) | BIT_MASK(EV_REP);
+	input_dev->ledbit[0] =
+			BIT_MASK(LED_NUML) | BIT_MASK(LED_CAPSL) | BIT_MASK(LED_SCROLLL) | BIT_MASK(LED_COMPOSE) | BIT_MASK(LED_KANA);
 
-	for (i = 0; i < sizeof(az_kbd_keycode); i++)
-		set_bit(az_kbd_keycode[i], input_dev->keybit);
+	for (i = 0; i < sizeof(px_kbd_keycode); i++)
+		set_bit(px_kbd_keycode[i], input_dev->keybit);
 
-	clear_bit(0, input_dev->keybit);
+	clear_bit(KEY_RESERVED, input_dev->keybit);
 
 	input_dev->event = usb_kbd_event;
 	input_dev->open = usb_kbd_open;
@@ -438,7 +433,7 @@ static struct usb_driver usb_kbd_driver = {
 static int __init usb_kbd_init(void)
 {
 	int result = usb_register(&usb_kbd_driver);
-	printk(KERN_INFO pr_fmt(DRIVER_DESC " registration status: %d"), result);
+	pr_info(DRIVER_DESC " registration status: %d", result);
 	return result;
 }
 

@@ -41,6 +41,8 @@ MODULE_AUTHOR(DRIVER_AUTHOR);
 MODULE_DESCRIPTION(DRIVER_DESC);
 MODULE_LICENSE(DRIVER_LICENSE);
 
+#define debug(msg, keys)		pr_debug(msg " %d %d %d %d %d %d %d %d", keys[0], keys[1], keys[2], keys[3], keys[4], keys[5], keys[6], keys[7]);
+
 static const unsigned char px_kbd_keycode[224] = {
 		/* BEGIN 01 */
 /* 0-7 */	KEY_VOLUMEDOWN, KEY_VOLUMEUP, KEY_MEDIA, KEY_MUTE, KEY_PAUSE, KEY_PREVIOUSSONG, KEY_PLAYPAUSE, KEY_NEXTSONG,
@@ -153,25 +155,13 @@ static void usb_kbd_irq(struct urb *urb)
 	}
 
 	// The following lines are for logging keypresses to the
-	// kernel dmesg facility. Uncomment the following lines
+	// kernel dmesg facility. Build with DEBUG define
 	// to capture the keycode for any non-functioning keys
-	// and open a new issue on bitbucket.org with the key
+	// and open a new issue on the project page with the key
 	// you pressed and the keycode output below.
-#ifdef DEBUG
-	printk("Keyup keycode: ");
 
-	for (i = 0; i < 8; i++)
-		printk("%d ", kbd->old[i]);
-
-	printk("\n");
-
-	printk("Keydown keycode: ");
-
-	for (i = 0; i < 8; i++)
-		printk("%d ", kbd->new[i]);
-
-	printk("\n");
-#endif
+	debug("Keyup   keycode:", kbd->old);
+	debug("Keydown keycode:", kbd->new);
 
 	if (mode == 1) {
 		check_key_pressed_released(kbd, 35, KEY_HOMEPAGE);

@@ -3,7 +3,8 @@
 For Chipset `0x0c45`:`0x7603`
 The kernel reports the chipset as `Microdia`
 
-Written for the Perixx PX-1800 USB Keyboard.
+Written for the Perixx PX-1800 USB Keyboard, also works for other keyboards with the same chipset (e.g. Periboard 506II)
+
 This software is forked from Colin Svingen's Azio L70 USB Keyboard driver that can be found at https://bitbucket.org/Swoogan/aziokbd
 
 **NOTE: Makefile and instructions have been tested on Debian and Arch Linux.**

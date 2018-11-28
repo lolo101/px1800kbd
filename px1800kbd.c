@@ -41,10 +41,10 @@ MODULE_AUTHOR(DRIVER_AUTHOR);
 MODULE_DESCRIPTION(DRIVER_DESC);
 MODULE_LICENSE(DRIVER_LICENSE);
 
-#define debug(msg, keys)		pr_debug(msg " %d %d %d %d %d %d %d %d", keys[0], keys[1], keys[2], keys[3], keys[4], keys[5], keys[6], keys[7]);
+#define debug(idev, msg, keys)		dev_dbg(&idev->dev, msg " mode=%d %02X-%02X-%02X-%02X-%02X-%02X-%02X", keys[0], keys[1], keys[2], keys[3], keys[4], keys[5], keys[6], keys[7]);
 
 static const unsigned char px_kbd_keycode[224] = {
-		/* BEGIN 01 */
+		/* BEGIN MODE 01 */
 /* 0-7 */	KEY_VOLUMEDOWN, KEY_VOLUMEUP, KEY_MEDIA, KEY_MUTE, KEY_PAUSE, KEY_PREVIOUSSONG, KEY_PLAYPAUSE, KEY_NEXTSONG,
 /* 8-15 */	KEY_MAIL, KEY_HOMEPAGE, KEY_CALC, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED,
 /* 16-23 */	KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED,
@@ -52,9 +52,9 @@ static const unsigned char px_kbd_keycode[224] = {
 /* 32-39 */	KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED,
 /* 40-47 */	KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED,
 /* 48-55 */	KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED,
-		/* END 01 */
+		/* END MODE 01 */
 
-		/* BEGIN 04 */
+		/* BEGIN MODE 04 */
 /* 56-63 */	KEY_LEFTCTRL, KEY_LEFTSHIFT, KEY_LEFTALT, KEY_LEFTMETA, KEY_RIGHTCTRL, KEY_RIGHTSHIFT, KEY_RIGHTALT, KEY_RESERVED,
 /* 64-71 */	KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_A, KEY_B, KEY_C, KEY_D,
 /* 72-79 */	KEY_E, KEY_F, KEY_G, KEY_H, KEY_I, KEY_J, KEY_K, KEY_L,
@@ -62,9 +62,9 @@ static const unsigned char px_kbd_keycode[224] = {
 /* 88-95 */	KEY_U, KEY_V, KEY_W, KEY_X, KEY_Y, KEY_Z, KEY_1, KEY_2,
 /* 96-103 */	KEY_3, KEY_4, KEY_5, KEY_6, KEY_7, KEY_8, KEY_9, KEY_0,
 /* 104-111 */	KEY_ENTER, KEY_ESC, KEY_BACKSPACE, KEY_TAB, KEY_SPACE, KEY_MINUS, KEY_EQUAL, KEY_LEFTBRACE,
-		/* END 04 */
+		/* END MODE 04 */
 
-		/* BEGIN 05 */
+		/* BEGIN MODE 05 */
 /* 112-119 */	KEY_RIGHTBRACE, KEY_BACKSLASH, KEY_BACKSLASH, KEY_SEMICOLON, KEY_APOSTROPHE, KEY_GRAVE, KEY_COMMA, KEY_DOT,
 /* 120-127 */	KEY_SLASH, KEY_CAPSLOCK, KEY_F1, KEY_F2, KEY_F3, KEY_F4, KEY_F5, KEY_F6,
 /* 128-135 */	KEY_F7, KEY_F8, KEY_F9, KEY_F10, KEY_F11, KEY_F12, KEY_SYSRQ, KEY_SCROLLLOCK,
@@ -72,9 +72,9 @@ static const unsigned char px_kbd_keycode[224] = {
 /* 144-151 */	KEY_LEFT, KEY_DOWN, KEY_UP, KEY_NUMLOCK, KEY_KPSLASH, KEY_KPASTERISK, KEY_KPMINUS, KEY_KPPLUS,
 /* 152-159 */	KEY_KPENTER, KEY_KP1, KEY_KP2, KEY_KP3, KEY_KP4, KEY_KP5, KEY_KP6, KEY_KP7,
 /* 160-167 */	KEY_KP8, KEY_KP9, KEY_KP0, KEY_KPDOT, KEY_102ND, KEY_COMPOSE, KEY_RESERVED, KEY_RESERVED,
-		/* END 05 */
+		/* END MODE 05 */
 
-		/* BEGIN 06 */
+		/* BEGIN MODE 06 */
 /* 168-175 */	KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED,
 /* 176-183 */	KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED,
 /* 184-191 */	KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED,
@@ -82,7 +82,7 @@ static const unsigned char px_kbd_keycode[224] = {
 /* 200-207 */	KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED,
 /* 208-215 */	KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED,
 /* 216-223 */	KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED, KEY_RESERVED,
-		/* END 06 */
+		/* END MODE 06 */
 };
 
 /**
@@ -155,8 +155,8 @@ static void handle_mode(struct usb_kbd *kbd)
 	// to capture the keycode for any non-functioning keys
 	// and open a new issue on the project page with the key
 	// you pressed and the keycode output below.
-	debug("Keyup   keycode:", kbd->old);
-	debug("Keydown keycode:", kbd->new);
+	debug(kbd->dev, "Keyup   keycode:", kbd->old);
+	debug(kbd->dev, "Keydown keycode:", kbd->new);
 
 	if (mode == 1) {
 		check_key_pressed_released(kbd, 35, KEY_HOMEPAGE);
@@ -387,7 +387,7 @@ static int usb_kbd_probe_endpoint(struct usb_interface *iface, struct usb_endpoi
 
 	init_kbd_name(dev, kbd);
 
-	pr_info("detected %s", kbd->name);
+	dev_info(&input_dev->dev, "detected %s", kbd->name);
 
 	usb_make_path(dev, kbd->phys, sizeof(kbd->phys));
 	strlcat(kbd->phys, "/input0", sizeof(kbd->phys));

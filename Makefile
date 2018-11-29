@@ -5,7 +5,7 @@ KVER := $(shell uname -r)
 KSRC := /lib/modules/$(KVER)/build
 MODDESTDIR := /lib/modules/$(KVER)/kernel/drivers/input/keyboard
 MODULE_NAME := px1800kbd
-MODULE_VER := 2.0.0-SNAPSHOT
+MODULE_VER := 2.0.0
 MODSRCDIR := /usr/src/$(MODULE_NAME)-$(MODULE_VER)
 
 ifeq ($(DEBUG),y)
@@ -20,7 +20,6 @@ ccflags-y += $(DBGFLAGS)
 ifneq ($(KERNELRELEASE),)
 	obj-m := $(MODULE_NAME).o
 else
-	KSRC := /lib/modules/$(KVER)/build
 	PWD := $(shell pwd)
 endif
 
@@ -53,4 +52,3 @@ dkms:  clean
 	dkms add -m $(MODULE_NAME) -v $(MODULE_VER)
 	dkms build -m $(MODULE_NAME) -v $(MODULE_VER)
 	dkms install -m $(MODULE_NAME) -v $(MODULE_VER) --force
-

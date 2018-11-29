@@ -251,10 +251,7 @@ static int kbd_led_event(struct input_dev *dev)
 
 static int usb_kbd_event(struct input_dev *dev, unsigned int type, unsigned int code, int value)
 {
-	if (type != EV_LED)
-		return -1;
-
-	return kbd_led_event(dev);
+	return type == EV_LED ? kbd_led_event(dev) : -EPERM;
 }
 
 static void usb_kbd_close(struct input_dev *dev)
@@ -273,17 +270,18 @@ static void usb_kbd_led(struct urb *urb)
 		hid_err(urb->dev, "usb_submit_urb(leds) failed\n");
 }
 
-static int usb_kbd_alloc_mem(struct usb_device *dev, struct usb_kbd *kbd)
+static struct usb_kbd __must_check *usb_kbd_alloc_mem(struct usb_device *dev)
 {
-	if (
+	struct usb_kbd *kbd = kzalloc(sizeof(struct usb_kbd), GFP_KERNEL);
+	if (kbd &&
 			(kbd->irq = usb_alloc_urb(0, GFP_KERNEL)) &&
 			(kbd->led = usb_alloc_urb(0, GFP_KERNEL)) &&
 			(kbd->new = usb_alloc_coherent(dev, 8, GFP_ATOMIC, &kbd->new_dma)) &&
 			(kbd->cr = kmalloc(sizeof(struct usb_ctrlrequest), GFP_KERNEL)) &&
 			(kbd->leds = usb_alloc_coherent(dev, 1, GFP_ATOMIC, &kbd->leds_dma)))
-		return 0;
+		return kbd;
 
-	return -1;
+	return NULL;
 }
 
 static void usb_kbd_free_mem(struct usb_device *dev, struct usb_kbd *kbd)
@@ -293,6 +291,7 @@ static void usb_kbd_free_mem(struct usb_device *dev, struct usb_kbd *kbd)
 	usb_free_coherent(dev, 8, kbd->new, kbd->new_dma);
 	kfree(kbd->cr);
 	usb_free_coherent(dev, 1, kbd->leds, kbd->leds_dma);
+	kfree(kbd);
 }
 
 static void init_kbd_name(struct usb_device *dev, struct usb_kbd *kbd)
@@ -371,48 +370,42 @@ static void init_kbd_led(struct usb_device *dev, struct usb_kbd *kbd)
 
 static int usb_kbd_probe_endpoint(struct usb_interface *iface, struct usb_endpoint_descriptor *endpoint)
 {
-	struct usb_device *dev = interface_to_usbdev(iface);
-	struct usb_kbd *kbd = kzalloc(sizeof(struct usb_kbd), GFP_KERNEL);
-	struct input_dev *input_dev = input_allocate_device();
 	int error = -ENOMEM;
+	struct usb_device *dev = interface_to_usbdev(iface);
+	struct usb_kbd *kbd = usb_kbd_alloc_mem(dev);
 
-	if (!kbd || !input_dev)
-		goto fail1;
+	if (kbd) {
+		struct input_dev *input_dev = input_allocate_device();
 
-	if (usb_kbd_alloc_mem(dev, kbd))
-		goto fail2;
+		if (input_dev) {
+			kbd->usbdev = dev;
+			kbd->dev = input_dev;
 
-	kbd->usbdev = dev;
-	kbd->dev = input_dev;
+			init_kbd_name(dev, kbd);
 
-	init_kbd_name(dev, kbd);
+			dev_info(&input_dev->dev, "detected %s", kbd->name);
 
-	dev_info(&input_dev->dev, "detected %s", kbd->name);
+			usb_make_path(dev, kbd->phys, sizeof(kbd->phys));
+			strlcat(kbd->phys, "/input0", sizeof(kbd->phys));
 
-	usb_make_path(dev, kbd->phys, sizeof(kbd->phys));
-	strlcat(kbd->phys, "/input0", sizeof(kbd->phys));
+			init_kbd_dev(input_dev, kbd);
+			usb_to_input_id(dev, &input_dev->id);
+			input_dev->dev.parent = &iface->dev;
 
-	init_kbd_dev(input_dev, kbd);
-	usb_to_input_id(dev, &input_dev->id);
-	input_dev->dev.parent = &iface->dev;
+			init_kbd_irq(dev, kbd, endpoint);
+			init_kbd_cr(kbd->cr);
+			init_kbd_led(dev, kbd);
 
-	init_kbd_irq(dev, kbd, endpoint);
-	init_kbd_cr(kbd->cr);
-	init_kbd_led(dev, kbd);
-
-	error = input_register_device(input_dev);
-	if (error)
-		goto fail2;
-
-	usb_set_intfdata(iface, kbd);
-	device_set_wakeup_enable(&dev->dev, 1);
-	return 0;
-
-fail2:
-	usb_kbd_free_mem(dev, kbd);
-fail1:
-	input_free_device(input_dev);
-	kfree(kbd);
+			error = input_register_device(input_dev);
+			if (error == 0) {
+				usb_set_intfdata(iface, kbd);
+				device_set_wakeup_enable(&dev->dev, 1);
+				return 0;
+			}
+			input_free_device(input_dev);
+		}
+		usb_kbd_free_mem(dev, kbd);
+	}
 	return error;
 }
 
@@ -436,7 +429,6 @@ static void usb_kbd_disconnect(struct usb_interface *intf)
 		usb_kill_urb(kbd->irq);
 		input_unregister_device(kbd->dev);
 		usb_kbd_free_mem(interface_to_usbdev(intf), kbd);
-		kfree(kbd);
 	}
 }
 

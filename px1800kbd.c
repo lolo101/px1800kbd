@@ -294,8 +294,16 @@ static void usb_kbd_free_mem(struct usb_device *dev, struct usb_kbd *kbd)
 	kfree(kbd);
 }
 
-static void init_kbd_name(struct usb_device *dev, struct usb_kbd *kbd)
+static void init_urb_transfer(struct urb* urb, dma_addr_t dmaAddr)
 {
+	urb->transfer_dma = dmaAddr;
+	urb->transfer_flags |= URB_NO_TRANSFER_DMA_MAP;
+}
+
+static void init_kbd_name(struct usb_kbd *kbd)
+{
+	struct usb_device *dev = kbd->usbdev;
+
 	if (dev->manufacturer)
 		strlcpy(kbd->name, dev->manufacturer, sizeof(kbd->name));
 
@@ -314,9 +322,50 @@ static void init_kbd_name(struct usb_device *dev, struct usb_kbd *kbd)
 	}
 }
 
-static void init_kbd_dev(struct input_dev *input_dev, struct usb_kbd *kbd)
+static void init_kbd_phys(struct usb_kbd *kbd)
+{
+	struct usb_device *dev = kbd->usbdev;
+	usb_make_path(dev, kbd->phys, sizeof(kbd->phys));
+	strlcat(kbd->phys, "/input0", sizeof(kbd->phys));
+}
+
+static void init_kbd_irq(struct usb_kbd *kbd, struct usb_endpoint_descriptor *endpoint)
+{
+	struct usb_device *dev = kbd->usbdev;
+	int pipe = usb_rcvintpipe(dev, endpoint->bEndpointAddress);
+	int maxp = usb_maxpacket(dev, pipe, usb_pipeout(pipe));
+	struct urb* irq = kbd->irq;
+
+	usb_fill_int_urb(irq, dev, pipe,
+			 kbd->new, min(maxp, 8),
+			 usb_kbd_irq, kbd, endpoint->bInterval);
+	init_urb_transfer(irq, kbd->new_dma);
+}
+
+static void init_kbd_cr(struct usb_ctrlrequest *cr)
+{
+	cr->bRequestType = USB_TYPE_CLASS | USB_RECIP_INTERFACE;
+	cr->bRequest = 0x09;
+	cr->wValue = cpu_to_le16(0x200);
+	cr->wIndex = cpu_to_le16(0);
+	cr->wLength = cpu_to_le16(1);
+}
+
+static void init_kbd_led(struct usb_kbd *kbd)
+{
+	struct usb_device *dev = kbd->usbdev;
+	struct urb* led = kbd->led;
+	usb_fill_control_urb(
+		led, dev, usb_sndctrlpipe(dev, 0),
+		(void *) kbd->cr, kbd->leds, 1,
+		usb_kbd_led, kbd);
+	init_urb_transfer(led, kbd->leds_dma);
+}
+
+static void init_kbd_dev(struct usb_kbd *kbd)
 {
 	int i;
+	struct input_dev *input_dev = kbd->dev;
 
 	input_dev->name = kbd->name;
 	input_dev->phys = kbd->phys;
@@ -336,38 +385,6 @@ static void init_kbd_dev(struct input_dev *input_dev, struct usb_kbd *kbd)
 	clear_bit(KEY_RESERVED, input_dev->keybit);
 }
 
-static void init_kbd_irq(struct usb_device *dev, struct usb_kbd *kbd, struct usb_endpoint_descriptor *endpoint)
-{
-	int pipe = usb_rcvintpipe(dev, endpoint->bEndpointAddress);
-	int maxp = usb_maxpacket(dev, pipe, usb_pipeout(pipe));
-	struct urb* irq = kbd->irq;
-
-	usb_fill_int_urb(irq, dev, pipe,
-			 kbd->new, (maxp > 8 ? 8 : maxp),
-			 usb_kbd_irq, kbd, endpoint->bInterval);
-	irq->transfer_dma = kbd->new_dma;
-	irq->transfer_flags |= URB_NO_TRANSFER_DMA_MAP;
-}
-
-static void init_kbd_cr(struct usb_ctrlrequest *cr)
-{
-	cr->bRequestType = USB_TYPE_CLASS | USB_RECIP_INTERFACE;
-	cr->bRequest = 0x09;
-	cr->wValue = cpu_to_le16(0x200);
-	cr->wIndex = cpu_to_le16(0);
-	cr->wLength = cpu_to_le16(1);
-}
-
-static void init_kbd_led(struct usb_device *dev, struct usb_kbd *kbd)
-{
-	usb_fill_control_urb(
-		kbd->led, dev, usb_sndctrlpipe(dev, 0),
-		(void *) kbd->cr, kbd->leds, 1,
-		usb_kbd_led, kbd);
-	kbd->led->transfer_dma = kbd->leds_dma;
-	kbd->led->transfer_flags |= URB_NO_TRANSFER_DMA_MAP;
-}
-
 static int usb_kbd_probe_endpoint(struct usb_interface *iface, struct usb_endpoint_descriptor *endpoint)
 {
 	int error = -ENOMEM;
@@ -376,25 +393,22 @@ static int usb_kbd_probe_endpoint(struct usb_interface *iface, struct usb_endpoi
 
 	if (kbd) {
 		struct input_dev *input_dev = input_allocate_device();
+		kbd->usbdev = dev;
 
 		if (input_dev) {
-			kbd->usbdev = dev;
 			kbd->dev = input_dev;
 
-			init_kbd_name(dev, kbd);
-
-			dev_info(&input_dev->dev, "detected %s", kbd->name);
-
-			usb_make_path(dev, kbd->phys, sizeof(kbd->phys));
-			strlcat(kbd->phys, "/input0", sizeof(kbd->phys));
-
-			init_kbd_dev(input_dev, kbd);
 			usb_to_input_id(dev, &input_dev->id);
 			input_dev->dev.parent = &iface->dev;
 
-			init_kbd_irq(dev, kbd, endpoint);
+			init_kbd_name(kbd);
+			init_kbd_phys(kbd);
+			init_kbd_irq(kbd, endpoint);
 			init_kbd_cr(kbd->cr);
-			init_kbd_led(dev, kbd);
+			init_kbd_led(kbd);
+			init_kbd_dev(kbd);
+
+			dev_info(&input_dev->dev, "detected %s", kbd->name);
 
 			error = input_register_device(input_dev);
 			if (error == 0) {

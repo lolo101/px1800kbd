@@ -139,6 +139,7 @@ static void check_key_pressed_released(struct usb_kbd *kbd, int value, int keyco
 static void scan_keys_pressed_released(struct usb_kbd *kbd, int mode)
 {
 	int i, j, offset;
+
 	for (j = 1; j < 8; j++) {
 		offset = (mode - 3) * 56 + (j - 1) * 8;
 		for (i = 0; i < 8; i++)
@@ -183,6 +184,7 @@ static void handle_mode(struct usb_kbd *kbd)
 static void resubmit(struct urb *urb)
 {
 	int status = usb_submit_urb (urb, GFP_ATOMIC);
+
 	if (status) {
 		struct usb_kbd *kbd = urb->context;
 		struct usb_device * usbdev = kbd->usbdev;
@@ -208,17 +210,6 @@ static void usb_kbd_irq(struct urb *urb)
 		resubmit(urb);
 		break;
 	}
-}
-
-static int usb_kbd_open(struct input_dev *dev)
-{
-	struct usb_kbd *kbd = input_get_drvdata(dev);
-
-	kbd->irq->dev = kbd->usbdev;
-	if (usb_submit_urb(kbd->irq, GFP_KERNEL))
-		return -EIO;
-
-	return 0;
 }
 
 static int update_leds(struct usb_kbd *kbd)
@@ -249,6 +240,14 @@ static int kbd_led_event(struct input_dev *dev)
 	return 0;
 }
 
+static int usb_kbd_open(struct input_dev *dev)
+{
+	struct usb_kbd *kbd = input_get_drvdata(dev);
+
+	kbd->irq->dev = kbd->usbdev;
+	return usb_submit_urb(kbd->irq, GFP_KERNEL);
+}
+
 static int usb_kbd_event(struct input_dev *dev, unsigned int type, unsigned int code, int value)
 {
 	return type == EV_LED ? kbd_led_event(dev) : -EPERM;
@@ -273,6 +272,7 @@ static void usb_kbd_led(struct urb *urb)
 static struct usb_kbd __must_check *usb_kbd_alloc_mem(struct usb_device *dev)
 {
 	struct usb_kbd *kbd = kzalloc(sizeof(struct usb_kbd), GFP_KERNEL);
+
 	if (kbd &&
 			(kbd->irq = usb_alloc_urb(0, GFP_KERNEL)) &&
 			(kbd->led = usb_alloc_urb(0, GFP_KERNEL)) &&
@@ -324,8 +324,7 @@ static void init_kbd_name(struct usb_kbd *kbd)
 
 static void init_kbd_phys(struct usb_kbd *kbd)
 {
-	struct usb_device *dev = kbd->usbdev;
-	usb_make_path(dev, kbd->phys, sizeof(kbd->phys));
+	usb_make_path(kbd->usbdev, kbd->phys, sizeof(kbd->phys));
 	strlcat(kbd->phys, "/input0", sizeof(kbd->phys));
 }
 
@@ -355,6 +354,7 @@ static void init_kbd_led(struct usb_kbd *kbd)
 {
 	struct usb_device *dev = kbd->usbdev;
 	struct urb* led = kbd->led;
+
 	usb_fill_control_urb(
 		led, dev, usb_sndctrlpipe(dev, 0),
 		(void *) kbd->cr, kbd->leds, 1,
@@ -393,6 +393,7 @@ static int usb_kbd_probe_endpoint(struct usb_interface *iface, struct usb_endpoi
 
 	if (kbd) {
 		struct input_dev *input_dev = input_allocate_device();
+
 		kbd->usbdev = dev;
 
 		if (input_dev) {
@@ -463,6 +464,7 @@ static struct usb_driver usb_kbd_driver = {
 static int __init usb_kbd_init(void)
 {
 	int result = usb_register(&usb_kbd_driver);
+
 	pr_info(DRIVER_DESC " registration status: %d", result);
 	return result;
 }

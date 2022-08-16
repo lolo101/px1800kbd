@@ -332,7 +332,7 @@ static void init_kbd_irq(struct usb_kbd *kbd, struct usb_endpoint_descriptor *en
 {
 	struct usb_device *dev = kbd->usbdev;
 	int pipe = usb_rcvintpipe(dev, endpoint->bEndpointAddress);
-	int maxp = usb_maxpacket(dev, pipe, usb_pipeout(pipe));
+	int maxp = usb_maxpacket(dev, pipe);
 	struct urb* irq = kbd->irq;
 
 	usb_fill_int_urb(irq, dev, pipe,

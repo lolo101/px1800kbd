@@ -5,7 +5,7 @@ KVER := $(shell uname -r)
 KSRC := /lib/modules/$(KVER)/build
 MODDESTDIR := /lib/modules/$(KVER)/kernel/drivers/input/keyboard
 MODULE_NAME := px1800kbd
-MODULE_VER := 3.0.0.SNAPSHOT
+MODULE_VER := 3.0.0
 MODSRCDIR := /usr/src/$(MODULE_NAME)-$(MODULE_VER)
 
 ifeq ($(DEBUG),y)

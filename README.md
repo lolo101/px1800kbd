@@ -3,7 +3,8 @@
 For Chipset `0x0c45`:`0x7603`
 The kernel reports the chipset as `Microdia`
 
-Written for the Perixx PX-1800 USB Keyboard, also works for other keyboards with the same chipset (e.g. Periboard 506II)
+Written for the Perixx PX-1800 USB Keyboard,
+also works for other keyboards with the same chipset (e.g., Periboard 506II)
 
 This software is forked from Colin Svingen's Azio L70 USB Keyboard driver that can be found at https://bitbucket.org/Swoogan/aziokbd
 
@@ -19,7 +20,7 @@ Then, download the sources:
 
     git clone https://github.com/lolo101/px1800kbd.git
 
-`cd` into the sources directory:
+`cd` into the sources' directory:
 
     cd px1800kbd
 
@@ -27,7 +28,7 @@ At last, build the module. It is recommended to use DKMS to install the module:
 
     sudo ./install.sh dkms
 
-But you may also want to run a manual install:
+But you may also want to run a manual installation:
 
     sudo ./install.sh
 
@@ -43,7 +44,8 @@ If the command returns something like:
 
     usr/lib/modules/<kernel version>/kernel/usbhid.ko
 
-This means the usbhid driver is loaded early, before the file system is mounted. Therefore the usbhid configuration in `/etc/modprobe.d/usbhid.conf` cannot be read.
+This means the usbhid driver is loaded early, before the file system is mounted.
+Therefore, the usbhid configuration in `/etc/modprobe.d/usbhid.conf` cannot be read.
 
 The solution is to add that configuration to the initramfs:
 

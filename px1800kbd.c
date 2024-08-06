@@ -305,7 +305,7 @@ static void init_kbd_name(struct usb_kbd *kbd)
 	struct usb_device *dev = kbd->usbdev;
 
 	if (dev->manufacturer)
-		strlcpy(kbd->name, dev->manufacturer, sizeof(kbd->name));
+		strscpy(kbd->name, dev->manufacturer, sizeof(kbd->name));
 
 	if (dev->product) {
 		if (dev->manufacturer)
